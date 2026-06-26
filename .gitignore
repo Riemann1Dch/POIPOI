@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Runtime session data
+.pi-pet-session
+.pi-pet-session.bak
+window-pos.json
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swo
+*.swp
+
+# Logs
+*.log
+tmp/

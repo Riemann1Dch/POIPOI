@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="style.css">
+  <!-- 字体 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono&display=swap">
+</head>
+<body>
+  <!-- 左侧边栏标签（抽屉把手，在窗口左边框外侧） -->
+  <div id="sidebar-tab">
+    <span id="sidebar-icon">🐱</span>
+  </div>
+
+  <div id="window-frame">
+    <!-- 顶部标题栏 -->
+    <div id="title-bar">
+      <span id="title-name">✦ 派派</span>
+      <span id="theme-indicator">🌙</span>
+      <span id="clock-display"></span>
+    </div>
+
+    <div id="live2d-container">
+      <canvas id="live2d-canvas"></canvas>
+    </div>
+
+    <div id="chat-bubble" class="hidden">
+      <button class="copy-btn" id="copy-bubble-btn" title="复制文本">📋</button>
+      <div id="chat-text"></div>
+    </div>
+
+    <div id="input-area" class="hidden">
+      <button id="input-mode-label">💬 聊天</button>
+      <textarea id="chat-input" rows="2" placeholder="说点什么..." autocomplete="off"></textarea>
+      <button id="send-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 右侧菜单栏（贴边垂直排列） -->
+    <div id="menu-bar">
+      <button class="menu-btn" data-action="talk" title="💬 聊天">💬</button>
+      <!-- ☀️ 📰 已移除 -->
+      <button class="menu-btn" data-action="history" title="📜 历史">📜</button>
+      <button class="menu-btn" data-action="pi-cmd" title="🖥️ CMD">🖥️</button>
+      <div class="menu-spacer"></div>
+      <button class="menu-btn" data-action="theme" title="🎨 主题">🎨</button>
+      <button class="menu-btn" data-action="hide" title="🙈 隐藏">🙈</button>
+      <button class="menu-btn" data-action="quit" title="🚪 退出">🚪</button>
+    </div>
+
+    <div id="loading" class="hidden">
+      <div class="spinner"></div>
+      <span>加载中...</span>
+    </div>
+
+    <div id="history-overlay" class="hidden">
+      <div id="history-header">📜 历史对话 <span id="history-count"></span>
+        <button class="copy-btn" id="copy-history-btn" title="复制全部历史">📋</button>
+      </div>
+      <div id="history-content"></div>
+    </div>
+  </div>
+
+  <script src="./vendor/pixi.min.js"></script>
+  <script src="./vendor/live2dcubismcore.min.js"></script>
+  <script src="./vendor/cubism4.min.js"></script>
+  <script src="./renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "pi-pet",
+  "version": "0.1.0",
+  "description": "Pi Pet - Live2D Desktop Pet for Pi AI Agent",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "server": "node server.js",
+    "electron": "electron ."
+  },
+  "keywords": [
+    "poipoi",
+    "派派",
+    "live2d",
+    "desktop-pet"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^42.5.0"
+  },
+  "dependencies": {
+    "pixi-live2d-display": "^0.4.0"
+  }
+}
