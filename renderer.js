@@ -615,7 +615,7 @@ function renderHistory() {
   count.textContent = `(${historyMessages.length}条，显示最近${displayCount}条)`;
   content.innerHTML = historyMessages.slice(-displayCount).map(m => 
     `<div class="hist-msg hist-${m.role}">` +
-    `<div class="hist-role">${m.role === 'user' ? '👤 你' : '🤖 AI'}</div>` +
+    `<div class="hist-role">${m.role === 'user' ? '👤 你' : '派派'}</div>` +
     `<div class="hist-text">${escapeHtml(m.text)}</div>` +
     `</div>`
   ).join('');
