@@ -51,6 +51,7 @@ body {
 :root {
   --tab-width: 28px;
   --menu-width: 36px;
+  --bubble-area: 40px;
 }
 
 /* ================================
@@ -127,7 +128,7 @@ body {
 #window-frame {
   position: absolute;
   top: 0;
-  left: var(--tab-width);
+  left: calc(var(--tab-width) + var(--bubble-area));
   right: 0;
   bottom: 0;
   border: 1.5px solid var(--accent-border);
@@ -270,7 +271,9 @@ body {
   position: absolute;
   top: 42px;
   left: 16px;
-  right: calc(var(--menu-width) + 16px);
+  right: 16px;
+  max-width: calc(100% - 80px);
+  box-sizing: border-box;
   background: var(--bg-bubble);
   border: 1px solid rgba(129, 140, 248, 0.28);
   border-radius: 12px;
@@ -278,6 +281,7 @@ body {
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(129, 140, 248, 0.06);
+  overflow: hidden;
   pointer-events: auto;
   animation: bubbleIn 0.3s ease;
   z-index: 10;
@@ -288,14 +292,19 @@ body {
   line-height: 1.55;
   color: var(--text-primary);
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
   max-height: 200px;
   overflow-y: auto;
+  overflow-x: hidden;
   white-space: pre-wrap;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
   user-select: text;
   -webkit-user-select: text;
   cursor: text;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #chat-text::-webkit-scrollbar {
@@ -483,13 +492,15 @@ body {
 #sidebar-tab {
   position: absolute;
   top: 50%;
-  left: 0;
+  left: var(--bubble-area);
   transform: translateY(-50%);
   width: var(--tab-width);
   height: 145px;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 让子元素 #notif-bubble 的 absolute 定位相对此容器 */
+  z-index: 100;
   background: linear-gradient(180deg, var(--accent) 0%, var(--accent-bright) 100%);
   border-radius: 16px 0 0 16px;
   cursor: pointer;
@@ -641,4 +652,192 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* ========== 后台任务状态提示栏 ========== */
+#task-status-bar {
+  position: absolute;
+  bottom: 82px;
+  left: 16px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  font-size: 10px;
+  color: var(--accent);
+  cursor: pointer;
+  z-index: 15;
+  animation: fadeIn 0.2s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+#task-status-bar:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#task-status-bar.running {
+  border-color: var(--accent);
+}
+
+#task-status-bar.completed {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+#task-status-bar.failed {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+#task-status-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+#task-status-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========== 猫咪按钮晃动动画（持续到用户点击） ========== */
+
+  30% { transform: translateY(-50%) rotate(8deg); }
+  45% { transform: translateY(-50%) rotate(-6deg); }
+  60% { transform: translateY(-50%) rotate(6deg); }
+  75% { transform: translateY(-50%) rotate(-3deg); }
+  90% { transform: translateY(-50%) rotate(3deg); }
+
+/* ========== 气泡提示（在窗口左侧预留的气泡区域内） ========== */
+#notif-bubble {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  pointer-events: none;
+}
+
+#notif-bubble-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+/* 小三角尾巴指向右侧猫咪按钮 */
+#notif-bubble-text::after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 7px solid transparent;
+  border-left-color: var(--accent);
+  border-right: none;
+}
+
+/* ========== 任务详情弹窗 ========== */
+#task-detail-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  max-height: 240px;
+  background: var(--bg-history);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+}
+
+#task-detail-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--accent-border);
+}
+
+#task-detail-close {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#task-detail-close:hover {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+#task-detail-list {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.task-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.task-detail-item .task-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-detail-item .task-dot.running {
+  background: var(--accent);
+  animation: taskPulse 1.5s ease-in-out infinite;
+}
+
+.task-detail-item .task-dot.completed {
+  background: #22c55e;
+}
+
+.task-detail-item .task-dot.failed {
+  background: #ef4444;
 }

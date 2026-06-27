@@ -10,10 +10,16 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono&display=swap">
 </head>
 <body>
-  <!-- 左侧边栏标签（抽屉把手，在窗口左边框外侧） -->
+  <!-- 气泡（在预留的气泡区域内） -->
+  <div id="notif-bubble" class="hidden">
+    <span id="notif-bubble-text">!</span>
+  </div>
+
+  <!-- 左侧边栏标签（猫咪按钮） -->
   <div id="sidebar-tab">
     <span id="sidebar-icon">🐱</span>
   </div>
+
 
   <div id="window-frame">
     <!-- 顶部标题栏 -->
@@ -40,6 +46,12 @@
           <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
         </svg>
       </button>
+    </div>
+
+    <!-- 后台任务状态提示栏 -->
+    <div id="task-status-bar" class="hidden">
+      <span id="task-status-icon">⚙️</span>
+      <span id="task-status-text">执行中...</span>
     </div>
 
     <!-- 右侧菜单栏（贴边垂直排列） -->

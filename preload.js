@@ -32,4 +32,10 @@ contextBridge.exposeInMainWorld('pi', {
     ipcRenderer.on('dock-state', h);
     return () => ipcRenderer.removeListener('dock-state', h);
   },
+  /** 监听 wake-up 事件（窗口被唤醒/恢复时触发） */
+  onWakeUp: (cb) => {
+    const h = () => cb();
+    ipcRenderer.on('wake-up', h);
+    return () => ipcRenderer.removeListener('wake-up', h);
+  },
 });

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -26,7 +26,8 @@ const WINDOW_TITLE = '派派 PoiPoi';
 const WINDOW_WIDTH = 700;       // 内容区宽度（window-frame）
 const WINDOW_HEIGHT = 440;
 const TAB_WIDTH = 28;           // 侧边栏标签宽度（缩进后唯一可见部分）
-const TOTAL_WIDTH = WINDOW_WIDTH + TAB_WIDTH;  // 窗口总宽度（含外侧猫咪按钮）
+const BUBBLE_AREA = 40;         // 猫咪按钮左侧预留的气泡区域
+const TOTAL_WIDTH = WINDOW_WIDTH + TAB_WIDTH + BUBBLE_AREA;  // 窗口总宽度
 
 // ========== 停靠状态 ==========
 let isDocked = false;
@@ -62,13 +63,18 @@ function saveWindowPos() {
 /** 内容区右侧贴边时窗口的 X 坐标（展开状态） */
 function getRightX() {
   const { width } = screen.getPrimaryDisplay().size;
-  return width - TOTAL_WIDTH;
+  // 窗口左边缘 = 屏幕宽度 - (气泡区 + 猫咪按钮 + 内容区)
+  // 内容区在屏幕右边缘贴边
+  return width - (BUBBLE_AREA + TAB_WIDTH + WINDOW_WIDTH);
 }
 
 /** 停靠时只露出猫咪按钮的 X 坐标 */
 function getDockX() {
   const { width } = screen.getPrimaryDisplay().size;
-  return width - TAB_WIDTH;
+  // 停靠时猫咪按钮的右边缘 = 屏幕右边缘
+  // 猫咪按钮在窗口内的位置是 BUBBLE_AREA 偏移处
+  // 窗口左边缘 = 屏幕宽度 - BUBBLE_AREA - TAB_WIDTH
+  return width - BUBBLE_AREA - TAB_WIDTH;
 }
 
 // ========== 平滑动画（逐帧移动窗口 X 坐标） ==========
@@ -297,6 +303,14 @@ function createTray() {
   tray = new Tray(icon);
   tray.setToolTip('Pi Pet - AI 桌宠');
   tray.on('click', () => {
+    // 恢复托盘图标（如果有未读通知）
+    try {
+      if (tray.__notifActive) {
+        tray.setImage(nativeImage.createFromPath(path.join(__dirname, 'tray-icon.png')));
+        tray.setToolTip('派派 PoiPoi');
+        tray.__notifActive = false;
+      }
+    } catch(e) {}
     togglePetWindow();
   });
   createTrayMenu();
@@ -470,6 +484,33 @@ ipcMain.handle('send-to-pi', (_, msg) => {
     hidePetWindow();
     return true;
   }
+  if (msg?.type === 'task-completed') {
+    // 后台任务完成 → 托盘图标变为带提醒的版本
+    try {
+      if (tray && !tray.isDestroyed()) {
+        const alertPath = path.join(__dirname, 'tray-icon-alert.png');
+        if (fs.existsSync(alertPath)) {
+          tray.setImage(nativeImage.createFromPath(alertPath));
+          tray.setToolTip('派派 - 任务已完成');
+          tray.__notifActive = true;
+        }
+      }
+    } catch(e) {
+      console.error('Tray alert failed:', e);
+    }
+    return true;
+  }
+  if (msg?.type === 'reset-tray') {
+    // 用户点击窗口 → 恢复托盘图标
+    try {
+      if (tray && !tray.isDestroyed() && tray.__notifActive) {
+        tray.setImage(nativeImage.createFromPath(path.join(__dirname, 'tray-icon.png')));
+        tray.setToolTip('派派 PoiPoi');
+        tray.__notifActive = false;
+      }
+    } catch(e) {}
+    return true;
+  }
   if (msg?.type === 'quit') {
     saveWindowPos();
     app.quit();
@@ -554,20 +595,25 @@ ipcMain.handle('restart-pi', () => {
 
 // ========== 侧边栏标签点击 → 切换停靠/展开 ==========
 ipcMain.handle('restore-window', () => {
-  // 唤醒渲染进程：即使窗口停靠已久、渲染进程被挂起，也能恢复
-  if (mainWindow && !mainWindow.isDestroyed() && isDocked) {
-    mainWindow.setFocusable(true);
-    mainWindow.webContents.send('wake-up');
-  }
-
   if (!isActuallyVisible) {
+    // 从隐藏 → 显示：唤醒并恢复状态
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setFocusable(true);
+      mainWindow.webContents.send('wake-up');
+    }
     showPetWindow();
     if (hiddenPosition?.wasDocked) {
       undockWindow();
     }
   } else if (isDocked) {
+    // 从停靠 → 展开：唤醒并恢复状态
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setFocusable(true);
+      mainWindow.webContents.send('wake-up');
+    }
     undockWindow();
   } else {
+    // 展开中 → 停靠：不触发状态恢复
     dockWindow();
   }
   return true;

@@ -1,7 +1,7 @@
 {
-  "name": "pi-pet",
-  "version": "0.1.0",
-  "description": "Pi Pet - Live2D Desktop Pet for Pi AI Agent",
+  "name": "poipoi",
+  "version": "1.2.0",
+  "description": "派派 Poipoi - AI 桌面智能体 / Live2D Desktop Pet", 
   "main": "main.js",
   "scripts": {
     "start": "electron .",
